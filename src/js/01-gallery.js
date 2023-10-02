@@ -19,4 +19,5 @@ const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: "alt",
   // overlayOpacity: 0.7,
 });
+gallery.style.listStyleType = none;
 console.log(galleryItems);
