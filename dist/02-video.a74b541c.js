@@ -508,15 +508,32 @@ var _player = require("@vimeo/player");
 var _playerDefault = parcelHelpers.interopDefault(_player);
 var _lodashThrottle = require("lodash.throttle");
 var _lodashThrottleDefault = parcelHelpers.interopDefault(_lodashThrottle);
-const iframe = document.getElementById("vimeo-player");
+const localStorageKey = "videoplayer-current-time";
+const iframe = document.querySelector("iframe");
 const player = new Vimeo.Player(iframe);
-player.on("timeupdate", (0, _lodashThrottleDefault.default)(async (data)=>{
+player.on("play", function() {
+    console.log("played the video!");
+});
+player.on("play", onPlay);
+player.getVideoTitle().then(function(title) {
+    console.log("title:", title);
+});
+player.on("timeupdate", (data)=>{
     const currentTime = data.seconds;
-    localStorage.setItem("videoplayer-current-time", currentTime.toString());
-}, 1000));
-window.addEventListener("load", ()=>{
-    const storedTime = localStorage.getItem("videoplayer-current-time");
-    if (storedTime !== null) player.setCurrentTime(parseFloat(storedTime));
+    localStorage.setItem("videoplayer-current-time", currentTime);
+});
+const updateCurrentTime = (0, _lodashThrottleDefault.default)((currentTime)=>{
+    localStorage.setItem("videoplayer-current-time", currentTime);
+}, 1000);
+window.addEventListener("DOMContentLoaded", ()=>{
+    const savedTime = localStorage.getItem("videoplayer-current-time");
+    if (savedTime !== null) player.setCurrentTime(savedTime).then(function() {
+        player.play().then(function() {}).catch(function(error) {
+            console.error("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u0441\u043F\u0440\u043E\u0431\u0456 \u0432\u0456\u0434\u0442\u0432\u043E\u0440\u0438\u0442\u0438 \u0432\u0456\u0434\u0435\u043E:", error.message);
+        });
+    }).catch(function(error) {
+        console.error("\u041F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u0432\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u043D\u0456 \u0447\u0430\u0441\u0443 \u0432\u0456\u0434\u0442\u0432\u043E\u0440\u0435\u043D\u043D\u044F:", error.message);
+    });
 });
 
 },{"@vimeo/player":"kmmUG","lodash.throttle":"bGJVT","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kmmUG":[function(require,module,exports) {
